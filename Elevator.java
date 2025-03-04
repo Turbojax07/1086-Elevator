@@ -59,10 +59,10 @@ public class Elevator extends SubsystemBase {
 
         routine = new SysIdRoutine(
             new SysIdRoutine.Config(
-                Velocity.ofRelativeUnits(ElevatorConstants.sysIdRampUp, Units.Volts.per(Units.Seconds)), 
-                Voltage.ofRelativeUnits(ElevatorConstants.sysIdStep, Units.Volts), 
+                Velocity.ofRelativeUnits(ElevatorConstants.sysIdRampUp, Units.Volts.per(Units.Seconds)),
+                Voltage.ofRelativeUnits(ElevatorConstants.sysIdStep, Units.Volts),
                 Time.ofRelativeUnits(ElevatorConstants.sysIdTimeout, Units.Seconds)
-            ), 
+            ),
             new SysIdRoutine.Mechanism(
                 voltage -> io.setPosition(Meters.zero(), voltage.magnitude()),
                 log -> {

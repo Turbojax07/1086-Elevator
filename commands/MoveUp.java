@@ -24,7 +24,7 @@ public class MoveUp extends Command {
     public void execute() {
         Distance curPos = elevator.getGoalPose();
 
-        if (curPos.isEquivalent(ElevatorPosition.STOW.value)) {
+        if (curPos.isEquivalent(ElevatorPosition.INTAKE.value)) {
             elevator.setPosition(ElevatorPosition.L1);
         } else if (curPos.isEquivalent(ElevatorPosition.L1.value)) {
             elevator.setPosition(ElevatorPosition.L2);

@@ -10,6 +10,7 @@ public class SetPosition extends Command {
     private Elevator elevator;
 
     /**
+     * Creates a new SetPosition command.
      * Tells the elevator to go to a certain height above the ground.
      * 
      * @param position The height to travel to as a {@link Distance}
@@ -18,9 +19,12 @@ public class SetPosition extends Command {
     public SetPosition(Distance position, Elevator elevator) {
         this.position = position;
         this.elevator = elevator;
+
+        addRequirements(elevator);
     }
 
     /**
+     * Creates a new SetPosition command.
      * Tells the elevator to go to a certain height above the ground.
      * 
      * @param position The height to travel to as an {@link ElevatorPosition}
@@ -29,6 +33,8 @@ public class SetPosition extends Command {
     public SetPosition(ElevatorPosition position, Elevator elevator) {
         this.position = position.value;
         this.elevator = elevator;
+
+        addRequirements(elevator);
     }
 
     @Override

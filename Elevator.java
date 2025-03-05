@@ -37,12 +37,17 @@ public class Elevator extends SubsystemBase {
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-    private final ExponentialProfile profile = new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(ElevatorConstants.maxProfileVoltage - ElevatorConstants.kS - ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA));
+    private final ExponentialProfile l1Profile = new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(ElevatorConstants.maxProfileVoltage - ElevatorConstants.kS[0] - ElevatorConstants.kG[0], ElevatorConstants.kV, ElevatorConstants.kA[0]));
+    private final ExponentialProfile l2Profile = new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(ElevatorConstants.maxProfileVoltage - ElevatorConstants.kS[1] - ElevatorConstants.kG[1], ElevatorConstants.kV, ElevatorConstants.kA[1]));
+    private final ExponentialProfile l3Profile = new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(ElevatorConstants.maxProfileVoltage - ElevatorConstants.kS[2] - ElevatorConstants.kG[2], ElevatorConstants.kV, ElevatorConstants.kA[2]));
+
     private ExponentialProfile.State currentState = new ExponentialProfile.State(0, 0);
     private ExponentialProfile.State goalState = new ExponentialProfile.State(0, 0);
     private ExponentialProfile.State futureState = new ExponentialProfile.State(0, 0);
 
-    private ElevatorFeedforward feedforward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
+    private ElevatorFeedforward l1FeedForward = new ElevatorFeedforward(ElevatorConstants.kS[0], ElevatorConstants.kG[0], ElevatorConstants.kV, ElevatorConstants.kA[0]);
+    private ElevatorFeedforward l2FeedForward = new ElevatorFeedforward(ElevatorConstants.kS[1], ElevatorConstants.kG[1], ElevatorConstants.kV, ElevatorConstants.kA[1]);
+    private ElevatorFeedforward l3FeedForward = new ElevatorFeedforward(ElevatorConstants.kS[2], ElevatorConstants.kG[2], ElevatorConstants.kV, ElevatorConstants.kA[2]);
 
     private final SysIdRoutine routine;
 
@@ -80,15 +85,29 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         currentState = new ExponentialProfile.State(inputs.position.in(Meters), inputs.velocity.in(MetersPerSecond));
 
-        futureState = profile.calculate(0.02, currentState, goalState);
-        double feedForward = feedforward.calculateWithVelocities(currentState.velocity, futureState.velocity);
-        io.setPosition(Meters.of(futureState.position), feedForward);
+        double ffVolts = 0;
+	if (getPosition().in(Meters) < 0.33) {
+            futureState = l1Profile.calculate(0.02, currentState, goalState);
+            ffVolts = l1FeedForward.calculateWithVelocities(currentState.velocity, futureState.velocity);
+        }
+
+	if (getPosition().in(Meters) < 0.65) {
+            futureState = l2Profile.calculate(0.02, currentState, goalState);
+            ffVolts = l2FeedForward.calculateWithVelocities(currentState.velocity, futureState.velocity);
+        }
+
+	if (getPosition().in(Meters) > 0.65) {
+            futureState = l3Profile.calculate(0.02, currentState, goalState);
+            ffVolts = l3FeedForward.calculateWithVelocities(currentState.velocity, futureState.velocity);
+        }
+
+        io.setPosition(Meters.of(futureState.position), ffVolts);
 
         Logger.recordOutput("/Subsystems/Elevator/Position/Setpoint", futureState.position);
         Logger.recordOutput("/Subsystems/Elevator/Velocity/Setpoint", futureState.velocity);
         Logger.recordOutput("/Subsystems/Elevator/Position/Goal", goalState.position);
         Logger.recordOutput("/Subsystems/Elevator/Velocity/Goal", goalState.velocity);
-        Logger.recordOutput("/Subsystems/Elevator/Feedforward", feedForward);
+        Logger.recordOutput("/Subsystems/Elevator/Feedforward", ffVolts);
 
         io.updateInputs(inputs);
         Logger.processInputs("/RealOuptuts/Subsystems/Elevator", inputs);

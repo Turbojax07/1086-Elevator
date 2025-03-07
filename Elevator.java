@@ -71,6 +71,9 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
+        // Updating IO inputs
+        io.updateInputs(inputs);
+
         // Updating PID values
         pidController.setPID(AdjustableNumbers.getNumber("Elev_kP"), AdjustableNumbers.getNumber("Elev_kI"), AdjustableNumbers.getNumber("Elev_kD"));
 
@@ -95,15 +98,16 @@ public class Elevator extends SubsystemBase {
 
         io.setVoltage(Volts.of(ffVolts + pidController.calculate(currentState.position)));
 
-        Logger.recordOutput("/Subsystems/Elevator/Position/Measured", getPosition());
-        Logger.recordOutput("/Subsystems/Elevator/Velocity/Measured", getVelocity());
-        Logger.recordOutput("/Subsystems/Elevator/Position/Setpoint", setpointState.position);
+        Logger.recordOutput("/Subsystems/Elevator/Position/Measured", currentState.position);
+        Logger.recordOutput("/Subsystems/Elevator/Velocity/Measured", currentState.velocity);
+        Logger.recordOutput("/Subsystems/Elevator/Position/Goal",     goalState.position);
+
         Logger.recordOutput("/Subsystems/Elevator/Velocity/Setpoint", setpointState.velocity);
-        Logger.recordOutput("/Subsystems/Elevator/Position/Goal", goalState.position);
-        Logger.recordOutput("/Subsystems/Elevator/Velocity/Goal", goalState.velocity);
+        Logger.recordOutput("/Subsystems/Elevator/Position/Setpoint", setpointState.position);
+        Logger.recordOutput("/Subsystems/Elevator/Velocity/Goal",     goalState.velocity);
+
         Logger.recordOutput("/Subsystems/Elevator/Feedforward", ffVolts);
 
-        io.updateInputs(inputs);
         Logger.processInputs("/RealOutputs/Subsystems/Elevator/Inputs", inputs);
     }
 

@@ -55,6 +55,6 @@ public class ZeroElevator extends Command {
 
         Logger.recordOutput("/Subsystems/Elevator/Zeroing", false);
 
-        if (interrupted) elevator.resetPosition(Meters.zero());
+        if (interrupted) elevator.setMeasuredPosition(Meters.zero());
     }
 }

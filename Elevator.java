@@ -13,7 +13,6 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.AdjustableNumbers;
@@ -99,11 +98,11 @@ public class Elevator extends SubsystemBase {
         io.setVoltage(Volts.of(ffVolts + pidController.calculate(measuredState.position)));
 
         Logger.recordOutput("/Subsystems/Elevator/Position/Measured", measuredState.position);
-        Logger.recordOutput("/Subsystems/Elevator/Velocity/Measured", measuredState.velocity);
+        Logger.recordOutput("/Subsystems/Elevator/Position/Setpoint", setpointState.position);
         Logger.recordOutput("/Subsystems/Elevator/Position/Goal",     goalState.position);
 
+        Logger.recordOutput("/Subsystems/Elevator/Velocity/Measured", measuredState.velocity);
         Logger.recordOutput("/Subsystems/Elevator/Velocity/Setpoint", setpointState.velocity);
-        Logger.recordOutput("/Subsystems/Elevator/Position/Setpoint", setpointState.position);
         Logger.recordOutput("/Subsystems/Elevator/Velocity/Goal",     goalState.velocity);
 
         Logger.recordOutput("/Subsystems/Elevator/Feedforward", ffVolts);
@@ -111,56 +110,85 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("/RealOutputs/Subsystems/Elevator/Inputs", inputs);
     }
 
-    public Distance getPosition() {
-        return inputs.position;
+    /** Gets the measured position of the elevator. */
+    public Distance getMeasuredPosition() {
+        return Meters.of(measuredState.position);
     }
 
-    public void resetPosition(Distance newPosition) {
+    /**
+     * Resets the odometry of the elevator.
+     * 
+     * @param newPosition The position to set the odometry to.
+     */
+    public void setMeasuredPosition(Distance newPosition) {
         io.reset(newPosition);
     }
 
+    /** Gets the measured velocity of the elevator. */
+    public LinearVelocity getMeasuredVelocity() {
+        return MetersPerSecond.of(measuredState.velocity);
+    }
+
+    /** Gets the goal position of the elevator. */
     public Distance getGoalPosition() {
         return Meters.of(goalState.position);
     }
 
+    /**
+     * Sets the goal position of the elevator.
+     * 
+     * @param position The position to travel to.
+     */
     public void setGoalPosition(Distance position) {
         pidController.setGoal(new TrapezoidProfile.State(position.in(Meters), 0));
     }
 
-    public LinearVelocity getGoalVelocity() {
-        return MetersPerSecond.of(goalState.velocity);
-    }
-
+    /** Gets the setpoint position of the elevator. */
     public Distance getSetpointPosition() {
         return Meters.of(setpointState.position);
     }
 
+    /** Gets the setpoint velocity of the elevator. */
     public LinearVelocity getSetpointVelocity() {
         return MetersPerSecond.of(setpointState.velocity);
     }
 
+    /** Gets the output voltage of the elevator. */
     public Voltage getVoltage() {
         return inputs.leftVoltage;
     }
 
+    /**
+     * Sets the input voltage of the elevator.
+     * 
+     * @param volts The voltage to run at.
+     */
     public void setVoltage(Voltage volts) {
         io.setVoltage(volts);
     }
 
+    /** Gets the current (Amps) output of the elevator. */
     public Current getCurrent() {
         return inputs.leftCurrent;
     }
 
-    public LinearVelocity getVelocity() {
-        return inputs.velocity;
+    /** The sysId command for quasistatic forward. */
+    public Command sysIdQuasistaticForward() {
+        return routine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> inputs.position.gt(ElevatorConstants.sysIdMaxPosition));
     }
 
-    public Command sysIdRoutine() {
-        return Commands.sequence(
-            routine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> inputs.position.gt(ElevatorConstants.sysIdMaxPosition)),
-            routine.quasistatic(SysIdRoutine.Direction.kReverse).until(() -> inputs.position.lt(ElevatorConstants.sysIdMinPosition)),
-            routine.dynamic(SysIdRoutine.Direction.kForward).until(() -> inputs.position.gt(ElevatorConstants.sysIdMaxPosition)),
-            routine.dynamic(SysIdRoutine.Direction.kReverse).until(() -> inputs.position.lt(ElevatorConstants.sysIdMinPosition))
-        );
+    /** The sysId command for quasistatic reverse. */
+    public Command sysIdQuasistaticReverse() {
+        return routine.quasistatic(SysIdRoutine.Direction.kReverse).until(() -> inputs.position.lt(ElevatorConstants.sysIdMinPosition));
+    }
+
+    /** The sysId command for Dynamic forward. */
+    public Command sysIdDynamicForward() {
+        return routine.dynamic(SysIdRoutine.Direction.kForward).until(() -> inputs.position.gt(ElevatorConstants.sysIdMaxPosition));
+    }
+
+    /** The sysId command for Dynamic reverse. */
+    public Command sysIdDynamicReverse() {
+        return routine.dynamic(SysIdRoutine.Direction.kReverse).until(() -> inputs.position.lt(ElevatorConstants.sysIdMinPosition));
     }
 }

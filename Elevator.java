@@ -20,19 +20,14 @@ import frc.robot.Constants.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
-    public enum ElevatorPosition {
-        STOW(0),
-        INTAKE(0.066),
-        L1(0.33),
-        L2(0.65),
-        L3(1.10),
-        L4(1.75);
-
-        public Distance value;
-
-        private ElevatorPosition(double value) {
-            this.value = Meters.of(value);
-        }
+    public class ElevatorPosition {
+        public static final Distance STOW = Meters.of(0);
+        public static final Distance INTAKE = Meters.of(0.057);
+        public static final Distance L1 = Meters.of(0.33);
+        public static final Distance L2 = Meters.of(0.63);
+        public static final Distance L3Algae = Meters.of(0.81);
+        public static final Distance L3 = Meters.of(1.05);
+        public static final Distance L4 = Meters.of(1.76);
     }
 
     private final ElevatorIO io;

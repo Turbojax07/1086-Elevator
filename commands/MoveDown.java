@@ -24,15 +24,15 @@ public class MoveDown extends Command {
     public void execute() {
         Distance position = elevator.getGoalPose();
 
-        if (position.isEquivalent(ElevatorPosition.INTAKE.value)) {
+        if (position.isEquivalent(ElevatorPosition.INTAKE)) {
             elevator.setPosition(ElevatorPosition.L4);
-        } else if (position.isEquivalent(ElevatorPosition.L1.value)) {
+        } else if (position.isEquivalent(ElevatorPosition.L1)) {
             elevator.setPosition(ElevatorPosition.INTAKE);
-        } else if (position.isEquivalent(ElevatorPosition.L2.value)) {
+        } else if (position.isEquivalent(ElevatorPosition.L2)) {
             elevator.setPosition(ElevatorPosition.L1);
-        } else if (position.isEquivalent(ElevatorPosition.L3.value)) {
+        } else if (position.isEquivalent(ElevatorPosition.L3)) {
             elevator.setPosition(ElevatorPosition.L2);
-        } else if (position.isEquivalent(ElevatorPosition.L4.value)) {
+        } else if (position.isEquivalent(ElevatorPosition.L4)) {
             elevator.setPosition(ElevatorPosition.L3);
         }
     }

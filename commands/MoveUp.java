@@ -24,13 +24,13 @@ public class MoveUp extends Command {
     public void execute() {
         Distance curPos = elevator.getGoalPose();
 
-        if (curPos.isEquivalent(ElevatorPosition.INTAKE.value)) {
+        if (curPos.isEquivalent(ElevatorPosition.INTAKE)) {
             elevator.setPosition(ElevatorPosition.L1);
-        } else if (curPos.isEquivalent(ElevatorPosition.L1.value)) {
+        } else if (curPos.isEquivalent(ElevatorPosition.L1)) {
             elevator.setPosition(ElevatorPosition.L2);
-        } else if (curPos.isEquivalent(ElevatorPosition.L2.value)) {
+        } else if (curPos.isEquivalent(ElevatorPosition.L2)) {
             elevator.setPosition(ElevatorPosition.L3);
-        } else if (curPos.isEquivalent(ElevatorPosition.L3.value)) {
+        } else if (curPos.isEquivalent(ElevatorPosition.L3)) {
             elevator.setPosition(ElevatorPosition.L4);
         }
     }

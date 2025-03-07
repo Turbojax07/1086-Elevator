@@ -25,8 +25,8 @@ public interface ElevatorIO {
     }
 
     public void updateInputs(ElevatorIOInputs inputs);
+    
+    public void setVoltage(Voltage volts);
 
-    public void setPosition(Distance height, double ffVoltage);
-
-    public void reset();
+    public void reset(Distance newPosition);
 }

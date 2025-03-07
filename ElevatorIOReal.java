@@ -13,8 +13,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.AdjustableNumbers;
 
 public class ElevatorIOReal implements ElevatorIO {
     private final SparkMax leftMotor;
@@ -29,21 +29,16 @@ public class ElevatorIOReal implements ElevatorIO {
 
         SparkMaxConfig config = new SparkMaxConfig();
         config
-            .inverted(false)
+            .inverted(true)
             .smartCurrentLimit(60)
             .idleMode(IdleMode.kCoast);
         config.encoder
             .positionConversionFactor(ElevatorConstants.positionConversionFactor)
             .velocityConversionFactor(ElevatorConstants.velocityConversionFactor);
-        config.closedLoop
-            .p(AdjustableNumbers.getValue("kPElev"))
-            .i(AdjustableNumbers.getValue("kIElev"))
-            .d(AdjustableNumbers.getValue("kDElev"));
 
         leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        config
-            .follow(leftMotor, true);
+        config.follow(leftMotor, true);
 
         rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -53,14 +48,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
-        if (AdjustableNumbers.hasChanged("kPElev") || AdjustableNumbers.hasChanged("kIElev") || AdjustableNumbers.hasChanged("kDElev")) {
-            SparkMaxConfig pidConfig = new SparkMaxConfig();
-            pidConfig.closedLoop.pid(AdjustableNumbers.getValue("kPElev"), AdjustableNumbers.getValue("kIElev"), AdjustableNumbers.getValue("kDElev"));
-
-            leftMotor.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-            rightMotor.configure(pidConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-        }
-
         inputs.position = Meters.of(encoder.getPosition());
         inputs.velocity = MetersPerSecond.of(encoder.getVelocity());
 
@@ -74,12 +61,12 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
     @Override
-    public void setPosition(Distance position, double ffVoltage) {
-        feedback.setReference(position.in(Meters), ControlType.kPosition, ClosedLoopSlot.kSlot0, ffVoltage);
+    public void setVoltage(Voltage volts) {
+        feedback.setReference(volts.in(Volts), ControlType.kVoltage, ClosedLoopSlot.kSlot0);
     }
 
     @Override
-    public void reset() {
-        encoder.setPosition(0);
+    public void reset(Distance newPosition) {
+        encoder.setPosition(newPosition.in(Meters));
     }
 }

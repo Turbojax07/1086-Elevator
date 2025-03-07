@@ -30,7 +30,7 @@ public class SetPosition extends Command {
     @Override
     public void execute() {
         System.out.println("Command running");
-        elevator.setPosition(position);
+        elevator.setGoalPosition(position);
     }
 
     @Override

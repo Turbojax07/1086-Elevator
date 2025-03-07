@@ -22,16 +22,16 @@ public class MoveUp extends Command {
 
     @Override
     public void execute() {
-        Distance curPos = elevator.getGoalPose();
+        Distance curPos = elevator.getGoalPosition();
 
         if (curPos.isEquivalent(ElevatorPosition.INTAKE)) {
-            elevator.setPosition(ElevatorPosition.L1);
+            elevator.setGoalPosition(ElevatorPosition.L1);
         } else if (curPos.isEquivalent(ElevatorPosition.L1)) {
-            elevator.setPosition(ElevatorPosition.L2);
+            elevator.setGoalPosition(ElevatorPosition.L2);
         } else if (curPos.isEquivalent(ElevatorPosition.L2)) {
-            elevator.setPosition(ElevatorPosition.L3);
+            elevator.setGoalPosition(ElevatorPosition.L3);
         } else if (curPos.isEquivalent(ElevatorPosition.L3)) {
-            elevator.setPosition(ElevatorPosition.L4);
+            elevator.setGoalPosition(ElevatorPosition.L4);
         }
     }
 

@@ -22,18 +22,18 @@ public class MoveDown extends Command {
 
     @Override
     public void execute() {
-        Distance position = elevator.getGoalPose();
+        Distance position = elevator.getGoalPosition();
 
         if (position.isEquivalent(ElevatorPosition.INTAKE)) {
-            elevator.setPosition(ElevatorPosition.L4);
+            elevator.setGoalPosition(ElevatorPosition.L4);
         } else if (position.isEquivalent(ElevatorPosition.L1)) {
-            elevator.setPosition(ElevatorPosition.INTAKE);
+            elevator.setGoalPosition(ElevatorPosition.INTAKE);
         } else if (position.isEquivalent(ElevatorPosition.L2)) {
-            elevator.setPosition(ElevatorPosition.L1);
+            elevator.setGoalPosition(ElevatorPosition.L1);
         } else if (position.isEquivalent(ElevatorPosition.L3)) {
-            elevator.setPosition(ElevatorPosition.L2);
+            elevator.setGoalPosition(ElevatorPosition.L2);
         } else if (position.isEquivalent(ElevatorPosition.L4)) {
-            elevator.setPosition(ElevatorPosition.L3);
+            elevator.setGoalPosition(ElevatorPosition.L3);
         }
     }
 

@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
@@ -103,19 +104,36 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("/Subsystems/Elevator/Feedforward", ffVolts);
 
         io.updateInputs(inputs);
-        Logger.processInputs("/RealOuptuts/Subsystems/Elevator", inputs);
+        Logger.processInputs("/RealOutputs/Subsystems/Elevator/Inputs", inputs);
     }
 
     public Distance getPosition() {
         return inputs.position;
     }
 
-    public void setPosition(Distance position) {
+    public void resetPosition(Distance newPosition) {
+        io.reset(newPosition);
+    }
+
+    public Distance getGoalPosition() {
+        return Meters.of(goalState.position);
+    }
+
+    public void setGoalPosition(Distance position) {
+        System.out.println(position.in(Meters));
         pidController.setGoal(new TrapezoidProfile.State(position.in(Meters), 0));
     }
 
-    public Distance getGoalPose() {
-        return Meters.of(goalState.position);
+    public LinearVelocity getGoalVelocity() {
+        return MetersPerSecond.of(goalState.velocity);
+    }
+
+    public Distance getSetpointPosition() {
+        return Meters.of(setpointState.position);
+    }
+
+    public LinearVelocity getSetpointVelocity() {
+        return MetersPerSecond.of(setpointState.velocity);
     }
 
     public Voltage getVoltage() {
@@ -126,12 +144,12 @@ public class Elevator extends SubsystemBase {
         io.setVoltage(volts);
     }
 
-    public LinearVelocity getVelocity() {
-        return inputs.velocity;
+    public Current getCurrent() {
+        return inputs.leftCurrent;
     }
 
-    public void reset() {
-        io.reset(Meters.zero());
+    public LinearVelocity getVelocity() {
+        return inputs.velocity;
     }
 
     public Command sysIdRoutine() {

@@ -120,7 +120,6 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setGoalPosition(Distance position) {
-        System.out.println(position.in(Meters));
         pidController.setGoal(new TrapezoidProfile.State(position.in(Meters), 0));
     }
 

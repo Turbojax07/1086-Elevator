@@ -40,6 +40,7 @@ public class Elevator extends SubsystemBase {
     private ElevatorFeedforward l2FeedForward = new ElevatorFeedforward(AdjustableNumbers.getNumber("Elev_kS_L2"), AdjustableNumbers.getNumber("Elev_kG_L2"), AdjustableNumbers.getNumber("Elev_kV"), AdjustableNumbers.getNumber("Elev_kA_L2"));
     private ElevatorFeedforward l3FeedForward = new ElevatorFeedforward(AdjustableNumbers.getNumber("Elev_kS_L3"), AdjustableNumbers.getNumber("Elev_kG_L3"), AdjustableNumbers.getNumber("Elev_kV"), AdjustableNumbers.getNumber("Elev_kA_L3"));
 
+    private TrapezoidProfile.State measuredState = new TrapezoidProfile.State();
     private TrapezoidProfile.State setpointState = new TrapezoidProfile.State();
     private TrapezoidProfile.State goalState = new TrapezoidProfile.State();
 
@@ -78,28 +79,27 @@ public class Elevator extends SubsystemBase {
         pidController.setPID(AdjustableNumbers.getNumber("Elev_kP"), AdjustableNumbers.getNumber("Elev_kI"), AdjustableNumbers.getNumber("Elev_kD"));
 
         // Updating states
+        measuredState = new TrapezoidProfile.State(inputs.position.in(Meters), inputs.velocity.in(MetersPerSecond));
         setpointState = pidController.getSetpoint();
         goalState = pidController.getGoal();
 
-        TrapezoidProfile.State currentState = new TrapezoidProfile.State(getPosition().in(Meters), getVelocity().in(MetersPerSecond));
-
         double ffVolts = 0;
-        if (getPosition().in(Meters) < 0.33) {
-            ffVolts = l1FeedForward.calculateWithVelocities(currentState.velocity, pidController.getSetpoint().velocity);
+        if (measuredState.position < 0.33) {
+            ffVolts = l1FeedForward.calculateWithVelocities(measuredState.velocity, pidController.getSetpoint().velocity);
         }
 
-	    if (getPosition().in(Meters) < 0.65) {
-            ffVolts = l2FeedForward.calculateWithVelocities(currentState.velocity, pidController.getSetpoint().velocity);
+	    if (measuredState.position < 0.65) {
+            ffVolts = l2FeedForward.calculateWithVelocities(measuredState.velocity, pidController.getSetpoint().velocity);
         }
 
-        if (getPosition().in(Meters) > 0.65) {
-            ffVolts = l3FeedForward.calculateWithVelocities(currentState.velocity, pidController.getSetpoint().velocity);
+        if (measuredState.position > 0.65) {
+            ffVolts = l3FeedForward.calculateWithVelocities(measuredState.velocity, pidController.getSetpoint().velocity);
         }
 
-        io.setVoltage(Volts.of(ffVolts + pidController.calculate(currentState.position)));
+        io.setVoltage(Volts.of(ffVolts + pidController.calculate(measuredState.position)));
 
-        Logger.recordOutput("/Subsystems/Elevator/Position/Measured", currentState.position);
-        Logger.recordOutput("/Subsystems/Elevator/Velocity/Measured", currentState.velocity);
+        Logger.recordOutput("/Subsystems/Elevator/Position/Measured", measuredState.position);
+        Logger.recordOutput("/Subsystems/Elevator/Velocity/Measured", measuredState.velocity);
         Logger.recordOutput("/Subsystems/Elevator/Position/Goal",     goalState.position);
 
         Logger.recordOutput("/Subsystems/Elevator/Velocity/Setpoint", setpointState.velocity);

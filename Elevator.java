@@ -15,7 +15,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.AdjustableNumbers;
+import frc.robot.AdjustableValues;
 import frc.robot.Constants.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -33,11 +33,11 @@ public class Elevator extends SubsystemBase {
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-    private ProfiledPIDController pidController = new ProfiledPIDController(AdjustableNumbers.getNumber("Elev_kP"), AdjustableNumbers.getNumber("Elev_kI"), AdjustableNumbers.getNumber("Elev_kD"), new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity.in(MetersPerSecond), ElevatorConstants.maxAcceleration.in(MetersPerSecondPerSecond)));
+    private ProfiledPIDController pidController = new ProfiledPIDController(AdjustableValues.getNumber("Elev_kP"), AdjustableValues.getNumber("Elev_kI"), AdjustableValues.getNumber("Elev_kD"), new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity.in(MetersPerSecond), ElevatorConstants.maxAcceleration.in(MetersPerSecondPerSecond)));
 
-    private ElevatorFeedforward l1FeedForward = new ElevatorFeedforward(AdjustableNumbers.getNumber("Elev_kS_L1"), AdjustableNumbers.getNumber("Elev_kG_L1"), AdjustableNumbers.getNumber("Elev_kV"), AdjustableNumbers.getNumber("Elev_kA_L1"));
-    private ElevatorFeedforward l2FeedForward = new ElevatorFeedforward(AdjustableNumbers.getNumber("Elev_kS_L2"), AdjustableNumbers.getNumber("Elev_kG_L2"), AdjustableNumbers.getNumber("Elev_kV"), AdjustableNumbers.getNumber("Elev_kA_L2"));
-    private ElevatorFeedforward l3FeedForward = new ElevatorFeedforward(AdjustableNumbers.getNumber("Elev_kS_L3"), AdjustableNumbers.getNumber("Elev_kG_L3"), AdjustableNumbers.getNumber("Elev_kV"), AdjustableNumbers.getNumber("Elev_kA_L3"));
+    private ElevatorFeedforward l1FeedForward = new ElevatorFeedforward(AdjustableValues.getNumber("Elev_kS_L1"), AdjustableValues.getNumber("Elev_kG_L1"), AdjustableValues.getNumber("Elev_kV"), AdjustableValues.getNumber("Elev_kA_L1"));
+    private ElevatorFeedforward l2FeedForward = new ElevatorFeedforward(AdjustableValues.getNumber("Elev_kS_L2"), AdjustableValues.getNumber("Elev_kG_L2"), AdjustableValues.getNumber("Elev_kV"), AdjustableValues.getNumber("Elev_kA_L2"));
+    private ElevatorFeedforward l3FeedForward = new ElevatorFeedforward(AdjustableValues.getNumber("Elev_kS_L3"), AdjustableValues.getNumber("Elev_kG_L3"), AdjustableValues.getNumber("Elev_kV"), AdjustableValues.getNumber("Elev_kA_L3"));
 
     private TrapezoidProfile.State measuredState = new TrapezoidProfile.State();
     private TrapezoidProfile.State setpointState = new TrapezoidProfile.State();
@@ -75,7 +75,7 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
 
         // Updating PID values
-        pidController.setPID(AdjustableNumbers.getNumber("Elev_kP"), AdjustableNumbers.getNumber("Elev_kI"), AdjustableNumbers.getNumber("Elev_kD"));
+        pidController.setPID(AdjustableValues.getNumber("Elev_kP"), AdjustableValues.getNumber("Elev_kI"), AdjustableValues.getNumber("Elev_kD"));
 
         // Updating states
         measuredState = new TrapezoidProfile.State(inputs.position.in(Meters), inputs.velocity.in(MetersPerSecond));

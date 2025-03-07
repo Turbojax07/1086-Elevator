@@ -14,7 +14,7 @@ public class ElevatorIOSim implements ElevatorIO {
         LinearSystemId.createElevatorSystem(DCMotor.getNEO(2), ElevatorConstants.mass.in(Kilograms), ElevatorConstants.radius.in(Meters), ElevatorConstants.gearRatio),
         DCMotor.getNEO(2), 0, ElevatorConstants.maxHeight.in(Meters), true, 0);
 
-    private Voltage appliedVolts;
+    private Voltage appliedVolts = Volts.zero();
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {

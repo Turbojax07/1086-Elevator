@@ -26,7 +26,7 @@ public class MoveDown extends Command {
     public void execute() {
         Distance position = elevator.getGoalPosition();
 
-        if (position.isEquivalent(ElevatorPosition.INTAKE)) {
+        if (position.isEquivalent(ElevatorPosition.INTAKE) || position.isEquivalent(ElevatorPosition.STOW)) {
             elevator.setGoalPosition(ElevatorPosition.L4);
         } else if (position.isEquivalent(ElevatorPosition.L1)) {
             elevator.setGoalPosition(ElevatorPosition.INTAKE);

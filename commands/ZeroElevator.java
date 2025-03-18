@@ -32,11 +32,13 @@ public class ZeroElevator extends Command {
         addRequirements(elevator);
     }
 
+    /** Runs once when the command is first scheduled. */
     @Override
     public void initialize() {
         if (volts.gt(Volts.zero())) cancel();
     }
 
+    /** Runs once every tick the command is scheduled. */
     @Override
     public void execute() {
         Logger.recordOutput("/Subsystems/Elevator/Zeroing", true);
@@ -44,11 +46,17 @@ public class ZeroElevator extends Command {
         elevator.setVoltage(volts);
     }
 
+    /**
+     * Runs once every tick the command is scheduled.
+     * 
+     * @return Whether or not the command should end.
+     */
     @Override
     public boolean isFinished() {
         return elevator.getCurrent().gt(maxCurrent);
     }
 
+    /** Runs once when the command is cancelled. */
     @Override
     public void end(boolean interrupted) {
         elevator.setVoltage(Volts.zero());

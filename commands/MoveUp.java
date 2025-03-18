@@ -17,9 +17,11 @@ public class MoveUp extends Command {
         this.elevator = elevator;
     }
 
+    /** Runs once when the command is first scheduled. */
     @Override
     public void initialize() {}
 
+    /** Runs every tick that the command is scheduled. */
     @Override
     public void execute() {
         Distance curPos = elevator.getGoalPosition();
@@ -35,11 +37,17 @@ public class MoveUp extends Command {
         }
     }
 
+    /**
+     * Runs every tick that the command is scheduled.
+     * 
+     * @return Whether or not the command should end.
+     */
     @Override
     public boolean isFinished() {
         return true;
     }
 
+    /** Runs once when the command is cancelled. */
     @Override
     public void end(boolean interrupted) {}
 }

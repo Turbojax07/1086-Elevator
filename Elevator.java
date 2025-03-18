@@ -75,7 +75,24 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
 
         // Updating PID values
-        pidController.setPID(AdjustableValues.getNumber("Elev_kP"), AdjustableValues.getNumber("Elev_kI"), AdjustableValues.getNumber("Elev_kD"));
+        if (AdjustableValues.hasChanged("Elev_kP")) pidController.setP(AdjustableValues.getNumber("Elev_kP"));
+        if (AdjustableValues.hasChanged("Elev_kI")) pidController.setI(AdjustableValues.getNumber("Elev_kI"));
+        if (AdjustableValues.hasChanged("Elev_kD")) pidController.setD(AdjustableValues.getNumber("Elev_kD"));
+
+        if (AdjustableValues.hasChanged("Elev_kS_L1")) l1FeedForward.setKs(AdjustableValues.getNumber("Elev_kS_L1"));
+        if (AdjustableValues.hasChanged("Elev_kG_L1")) l1FeedForward.setKg(AdjustableValues.getNumber("Elev_kG_L1"));
+        if (AdjustableValues.hasChanged("Elev_kV_L1")) l1FeedForward.setKv(AdjustableValues.getNumber("Elev_kV_L1"));
+        if (AdjustableValues.hasChanged("Elev_kA_L1")) l1FeedForward.setKa(AdjustableValues.getNumber("Elev_kA_L1"));
+        
+        if (AdjustableValues.hasChanged("Elev_kS_L2")) l2FeedForward.setKs(AdjustableValues.getNumber("Elev_kS_L2"));
+        if (AdjustableValues.hasChanged("Elev_kG_L2")) l2FeedForward.setKg(AdjustableValues.getNumber("Elev_kG_L2"));
+        if (AdjustableValues.hasChanged("Elev_kV_L2")) l2FeedForward.setKv(AdjustableValues.getNumber("Elev_kV_L2"));
+        if (AdjustableValues.hasChanged("Elev_kA_L2")) l2FeedForward.setKa(AdjustableValues.getNumber("Elev_kA_L2"));
+        
+        if (AdjustableValues.hasChanged("Elev_kS_L3")) l3FeedForward.setKs(AdjustableValues.getNumber("Elev_kS_L3"));
+        if (AdjustableValues.hasChanged("Elev_kG_L3")) l3FeedForward.setKg(AdjustableValues.getNumber("Elev_kG_L3"));
+        if (AdjustableValues.hasChanged("Elev_kV_L3")) l3FeedForward.setKv(AdjustableValues.getNumber("Elev_kV_L3"));
+        if (AdjustableValues.hasChanged("Elev_kA_L3")) l3FeedForward.setKa(AdjustableValues.getNumber("Elev_kA_L3"));
 
         // Updating states
         measuredState = new TrapezoidProfile.State(inputs.position.in(Meters), inputs.velocity.in(MetersPerSecond));

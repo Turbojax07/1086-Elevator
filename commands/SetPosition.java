@@ -5,41 +5,44 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.Elevator;
 
 public class SetPosition extends Command {
-    private Distance position;
     private Elevator elevator;
+    private Distance position;
 
     /**
      * Creates a new SetPosition command.
      * Tells the elevator to go to a certain height above the ground.
      * 
-     * @param position The height to travel to as a {@link Distance}
      * @param elevator The elevator subsystem to use.
+     * @param position The height to travel to as a {@link Distance}
      */
-    public SetPosition(Distance position, Elevator elevator) {
-        this.position = position;
+    public SetPosition(Elevator elevator, Distance position) {
         this.elevator = elevator;
+        this.position = position;
 
         addRequirements(elevator);
     }
 
+    /** Runs once when the command is first scheduled. */
     @Override
-    public void initialize() {
-        System.out.println("Command started");
-    }
+    public void initialize() {}
 
+    /** Runs once every tick the command is scheduled. */
     @Override
     public void execute() {
-        System.out.println("Command running");
         elevator.setGoalPosition(position);
     }
 
+    /**
+     * Runs once every tick the command is scheduled.
+     * 
+     * @return Whether or not the command should end.
+     */
     @Override
     public boolean isFinished() {
         return true;
     }
 
+    /** Runs once when the command is cancelled. */
     @Override
-    public void end(boolean interrupted) {
-        System.out.println("Command stopping");
-    }
+    public void end(boolean interrupted) {}
 }

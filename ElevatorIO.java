@@ -24,9 +24,24 @@ public interface ElevatorIO {
         public Voltage rightVoltage = Volts.zero();
     }
 
+    /**
+     * Updates a set of IO inputs with current values.
+     * 
+     * @param inputs The inputs to update
+     */
     public void updateInputs(ElevatorIOInputs inputs);
     
+    /**
+     * Sets the output voltage of the elevator.
+     * 
+     * @param volts The voltage to apply.
+     */
     public void setVoltage(Voltage volts);
 
+    /**
+     * Resets the odometry of the elevator.
+     * 
+     * @param newPosition The position to reset to.
+     */
     public void reset(Distance newPosition);
 }

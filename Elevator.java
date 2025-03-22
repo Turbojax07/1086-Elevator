@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.AdjustableValues;
-import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -33,7 +33,7 @@ public class Elevator extends SubsystemBase {
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-    private ProfiledPIDController pidController = new ProfiledPIDController(AdjustableValues.getNumber("Elev_kP"), AdjustableValues.getNumber("Elev_kI"), AdjustableValues.getNumber("Elev_kD"), new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity.in(MetersPerSecond), ElevatorConstants.maxAcceleration.in(MetersPerSecondPerSecond)));
+    private ProfiledPIDController pidController = new ProfiledPIDController(AdjustableValues.getNumber("Elev_kP"), AdjustableValues.getNumber("Elev_kI"), AdjustableValues.getNumber("Elev_kD"), new TrapezoidProfile.Constraints(Constants.ElevatorConstants.maxVelocity.in(MetersPerSecond), Constants.ElevatorConstants.maxAcceleration.in(MetersPerSecondPerSecond)));
 
     private ElevatorFeedforward l1FeedForward = new ElevatorFeedforward(AdjustableValues.getNumber("Elev_kS_L1"), AdjustableValues.getNumber("Elev_kG_L1"), AdjustableValues.getNumber("Elev_kV"), AdjustableValues.getNumber("Elev_kA_L1"));
     private ElevatorFeedforward l2FeedForward = new ElevatorFeedforward(AdjustableValues.getNumber("Elev_kS_L2"), AdjustableValues.getNumber("Elev_kG_L2"), AdjustableValues.getNumber("Elev_kV"), AdjustableValues.getNumber("Elev_kA_L2"));
@@ -52,9 +52,9 @@ public class Elevator extends SubsystemBase {
 
         routine = new SysIdRoutine(
             new SysIdRoutine.Config(
-                Velocity.ofRelativeUnits(ElevatorConstants.sysIdRampUp, Units.Volts.per(Units.Seconds)),
-                Voltage.ofRelativeUnits(ElevatorConstants.sysIdStep, Units.Volts),
-                Time.ofRelativeUnits(ElevatorConstants.sysIdTimeout, Units.Seconds)
+                Velocity.ofRelativeUnits(Constants.ElevatorConstants.sysIdRampUp, Units.Volts.per(Units.Seconds)),
+                Voltage.ofRelativeUnits(Constants.ElevatorConstants.sysIdStep, Units.Volts),
+                Time.ofRelativeUnits(Constants.ElevatorConstants.sysIdTimeout, Units.Seconds)
             ),
             new SysIdRoutine.Mechanism(
                 this::setVoltage,
@@ -191,21 +191,21 @@ public class Elevator extends SubsystemBase {
 
     /** The sysId command for quasistatic forward. */
     public Command sysIdQuasistaticForward() {
-        return routine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> inputs.position.gt(ElevatorConstants.sysIdMaxPosition));
+        return routine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> inputs.position.gt(Constants.ElevatorConstants.sysIdMaxPosition));
     }
 
     /** The sysId command for quasistatic reverse. */
     public Command sysIdQuasistaticReverse() {
-        return routine.quasistatic(SysIdRoutine.Direction.kReverse).until(() -> inputs.position.lt(ElevatorConstants.sysIdMinPosition));
+        return routine.quasistatic(SysIdRoutine.Direction.kReverse).until(() -> inputs.position.lt(Constants.ElevatorConstants.sysIdMinPosition));
     }
 
     /** The sysId command for Dynamic forward. */
     public Command sysIdDynamicForward() {
-        return routine.dynamic(SysIdRoutine.Direction.kForward).until(() -> inputs.position.gt(ElevatorConstants.sysIdMaxPosition));
+        return routine.dynamic(SysIdRoutine.Direction.kForward).until(() -> inputs.position.gt(Constants.ElevatorConstants.sysIdMaxPosition));
     }
 
     /** The sysId command for Dynamic reverse. */
     public Command sysIdDynamicReverse() {
-        return routine.dynamic(SysIdRoutine.Direction.kReverse).until(() -> inputs.position.lt(ElevatorConstants.sysIdMinPosition));
+        return routine.dynamic(SysIdRoutine.Direction.kReverse).until(() -> inputs.position.lt(Constants.ElevatorConstants.sysIdMinPosition));
     }
 }

@@ -7,12 +7,12 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants;
 
 public class ElevatorIOSim implements ElevatorIO {
     private ElevatorSim sim = new ElevatorSim(
-        LinearSystemId.createElevatorSystem(DCMotor.getNEO(2), ElevatorConstants.mass.in(Kilograms), ElevatorConstants.radius.in(Meters), ElevatorConstants.gearRatio),
-        DCMotor.getNEO(2), 0, ElevatorConstants.maxHeight.in(Meters), true, 0);
+        LinearSystemId.createElevatorSystem(DCMotor.getNEO(2), Constants.ElevatorConstants.mass.in(Kilograms), Constants.ElevatorConstants.radius.in(Meters), Constants.ElevatorConstants.gearRatio),
+        DCMotor.getNEO(2), 0, Constants.ElevatorConstants.maxHeight.in(Meters), true, 0);
 
     private Voltage appliedVolts = Volts.zero();
 

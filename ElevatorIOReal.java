@@ -14,7 +14,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants;
 
 public class ElevatorIOReal implements ElevatorIO {
     private final SparkMax leftMotor;
@@ -33,8 +33,8 @@ public class ElevatorIOReal implements ElevatorIO {
             .smartCurrentLimit(60)
             .idleMode(IdleMode.kCoast);
         config.encoder
-            .positionConversionFactor(ElevatorConstants.positionConversionFactor)
-            .velocityConversionFactor(ElevatorConstants.velocityConversionFactor);
+            .positionConversionFactor(Constants.ElevatorConstants.positionConversionFactor)
+            .velocityConversionFactor(Constants.ElevatorConstants.velocityConversionFactor);
 
         leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 

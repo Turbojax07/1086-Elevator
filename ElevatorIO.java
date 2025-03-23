@@ -27,7 +27,7 @@ public interface ElevatorIO {
     /**
      * Updates a set of IO inputs with current values.
      * 
-     * @param inputs The inputs to update
+     * @param inputs The inputs to update.
      */
     public void updateInputs(ElevatorIOInputs inputs);
     

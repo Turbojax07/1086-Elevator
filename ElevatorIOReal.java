@@ -2,71 +2,57 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
 
 public class ElevatorIOReal implements ElevatorIO {
-    private final SparkMax leftMotor;
-    private final SparkMax rightMotor;
-
-    private final RelativeEncoder encoder;
-    private final SparkClosedLoopController feedback;
+    private final TalonFX leftMotor;
+    private final TalonFX rightMotor;
 
     public ElevatorIOReal(int leftId, int rightId) {
-        leftMotor = new SparkMax(leftId, MotorType.kBrushless);
-        rightMotor = new SparkMax(rightId, MotorType.kBrushless);
+        leftMotor = new TalonFX(leftId);
+        rightMotor = new TalonFX(rightId);
 
-        SparkMaxConfig config = new SparkMaxConfig();
-        config
-            .inverted(true)
-            .smartCurrentLimit(60)
-            .idleMode(IdleMode.kCoast);
-        config.encoder
-            .positionConversionFactor(Constants.ElevatorConstants.positionConversionFactor)
-            .velocityConversionFactor(Constants.ElevatorConstants.velocityConversionFactor);
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        config.Feedback.SensorToMechanismRatio = Constants.ElevatorConstants.gearRatio;
 
-        leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leftMotor.getConfigurator().apply(config);
+        rightMotor.getConfigurator().apply(config);
 
-        config.follow(leftMotor, true);
-
-        rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        encoder = leftMotor.getEncoder();
-        feedback = leftMotor.getClosedLoopController();
+        rightMotor.setControl(new Follower(leftId, true));
     }
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
-        inputs.position = Meters.of(encoder.getPosition());
-        inputs.velocity = MetersPerSecond.of(encoder.getVelocity());
+        inputs.position = Meters.of(leftMotor.getPosition().getValue().in(Radians) * Constants.ElevatorConstants.radius.in(Meters));
+        inputs.velocity = MetersPerSecond.of(leftMotor.getVelocity().getValue().in(RadiansPerSecond) * Constants.ElevatorConstants.radius.in(Meters));
 
-        inputs.leftCurrent = Amps.of(leftMotor.getOutputCurrent());
-        inputs.leftTemperature = Celsius.of(leftMotor.getMotorTemperature());
-        inputs.leftVoltage = Volts.of(leftMotor.getAppliedOutput() * leftMotor.getBusVoltage());
+        inputs.leftCurrent = leftMotor.getStatorCurrent().getValue();
+        inputs.leftTemperature = leftMotor.getDeviceTemp().getValue();
+        inputs.leftVoltage = leftMotor.getMotorVoltage().getValue();
 
-        inputs.rightCurrent = Amps.of(rightMotor.getOutputCurrent());
-        inputs.rightTemperature = Celsius.of(rightMotor.getMotorTemperature());
-        inputs.rightVoltage = Volts.of(rightMotor.getAppliedOutput() * rightMotor.getBusVoltage());
+        inputs.rightCurrent = rightMotor.getStatorCurrent().getValue();
+        inputs.rightTemperature = rightMotor.getDeviceTemp().getValue();
+        inputs.rightVoltage = rightMotor.getMotorVoltage().getValue();
     }
 
     @Override
     public void setVoltage(Voltage volts) {
-        feedback.setReference(volts.in(Volts), ControlType.kVoltage, ClosedLoopSlot.kSlot0);
+        leftMotor.setControl(new VoltageOut(volts));
     }
 
     @Override
     public void reset(Distance newPosition) {
-        encoder.setPosition(newPosition.in(Meters));
+        leftMotor.setPosition(newPosition.in(Meters) / Constants.ElevatorConstants.radius.in(Meters) / 2 / Math.PI);
+        rightMotor.setPosition(newPosition.in(Meters) / Constants.ElevatorConstants.radius.in(Meters) / 2 / Math.PI);
     }
 }

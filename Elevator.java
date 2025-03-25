@@ -30,8 +30,8 @@ public class Elevator extends SubsystemBase {
         public static final Distance L4 = Meters.of(1.76);
     }
 
-    private final ElevatorIO io;
-    private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+    private ElevatorIO io;
+    private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
     private ProfiledPIDController pidController = new ProfiledPIDController(AdjustableValues.getNumber("Elev_kP"), AdjustableValues.getNumber("Elev_kI"), AdjustableValues.getNumber("Elev_kD"), new TrapezoidProfile.Constraints(Constants.ElevatorConstants.maxVelocity.in(MetersPerSecond), Constants.ElevatorConstants.maxAcceleration.in(MetersPerSecondPerSecond)));
 
@@ -43,7 +43,9 @@ public class Elevator extends SubsystemBase {
     private TrapezoidProfile.State setpointState = new TrapezoidProfile.State();
     private TrapezoidProfile.State goalState = new TrapezoidProfile.State();
 
-    private final SysIdRoutine routine;
+    private SysIdRoutine routine;
+
+    private boolean voltageControl = false;
 
     public Elevator(ElevatorIO io) {
         this.io = io;
@@ -112,8 +114,11 @@ public class Elevator extends SubsystemBase {
             ffVolts = l3FeedForward.calculateWithVelocities(measuredState.velocity, pidController.getSetpoint().velocity);
         }
 
-        io.setVoltage(Volts.of(ffVolts + pidController.calculate(measuredState.position)));
+        // Only controls the elevator if voltage control is disabled
+        // voltage control is disabled when the setGoalPosition function is run.
+        if (!voltageControl) io.setVoltage(Volts.of(ffVolts + pidController.calculate(measuredState.position)));
 
+        // Logging values
         Logger.recordOutput("/Subsystems/Elevator/Position/Measured", measuredState.position);
         Logger.recordOutput("/Subsystems/Elevator/Position/Setpoint", setpointState.position);
         Logger.recordOutput("/Subsystems/Elevator/Position/Goal",     goalState.position);
@@ -157,6 +162,8 @@ public class Elevator extends SubsystemBase {
      * @param position The position to travel to.
      */
     public void setGoalPosition(Distance position) {
+        voltageControl = false;
+
         pidController.setGoal(new TrapezoidProfile.State(position.in(Meters), 0));
     }
 
@@ -181,6 +188,8 @@ public class Elevator extends SubsystemBase {
      * @param volts The voltage to run at.
      */
     public void setVoltage(Voltage volts) {
+        voltageControl = true;
+
         io.setVoltage(volts);
     }
 

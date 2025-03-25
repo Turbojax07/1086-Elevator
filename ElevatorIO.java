@@ -12,16 +12,16 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
     @AutoLog
     public static class ElevatorIOInputs {
-        public Distance position = Meters.zero();
-        public LinearVelocity velocity = MetersPerSecond.zero();
+        Distance position = Meters.zero();
+        LinearVelocity velocity = MetersPerSecond.zero();
 
-        public Current leftCurrent = Amps.zero();
-        public Temperature leftTemperature = Celsius.zero();
-        public Voltage leftVoltage = Volts.zero();
+        Current leftCurrent = Amps.zero();
+        Temperature leftTemperature = Celsius.zero();
+        Voltage leftVoltage = Volts.zero();
 
-        public Current rightCurrent = Amps.zero();
-        public Temperature rightTemperature = Celsius.zero();
-        public Voltage rightVoltage = Volts.zero();
+        Current rightCurrent = Amps.zero();
+        Temperature rightTemperature = Celsius.zero();
+        Voltage rightVoltage = Volts.zero();
     }
 
     /**

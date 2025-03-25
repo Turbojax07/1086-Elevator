@@ -2,12 +2,11 @@ package frc.robot.subsystems.elevator.commands;
 
 import static edu.wpi.first.units.Units.*;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.Elevator;
+import org.littletonrobotics.junction.Logger;
 
 public class ZeroElevator extends Command {
     private Elevator elevator;
@@ -32,10 +31,14 @@ public class ZeroElevator extends Command {
         addRequirements(elevator);
     }
 
-    /** Runs once when the command is first scheduled. */
+    /** 
+     * Runs once when the command is first scheduled.
+     * 
+     * It cancels the command if voltage is >= 0 because positive voltage is up, which is not the correct direction to go for zeroing.  Also, a voltage of 0 does nothing.
+     */
     @Override
     public void initialize() {
-        if (volts.gt(Volts.zero())) cancel();
+        if (volts.gte(Volts.zero())) cancel();
     }
 
     /** Runs once every tick the command is scheduled. */
@@ -63,6 +66,6 @@ public class ZeroElevator extends Command {
 
         Logger.recordOutput("/Subsystems/Elevator/Zeroing", false);
 
-        if (interrupted) elevator.setMeasuredPosition(Meters.zero());
+        elevator.setMeasuredPosition(Meters.zero());
     }
 }
